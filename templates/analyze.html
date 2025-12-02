@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume Analyzer</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1 class="name">Resume Analyzer</h1>
+        <p class="title">Paste your resume text or upload a plain .txt file</p>
+        <p><a href="/" class="muted">← Back to resume</a></p>
+      </header>
+
+      <section class="section">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash">
+              {% for m in messages %}
+                <li>{{ m }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" enctype="multipart/form-data">
+          <label for="resume_text">Paste resume text</label>
+          <textarea id="resume_text" name="resume_text" rows="12">{{ resume_text }}</textarea>
+
+          <label for="resume_file">Or upload .txt file (optional)</label>
+          <input type="file" id="resume_file" name="resume_file" accept=".txt" />
+
+          <div style="margin-top:10px;">
+            <button class="btn" type="submit">Analyze</button>
+          </div>
+        </form>
+      </section>
+
+      {% if report %}
+      <section class="section">
+        <h2>Report — Score: {{ report.score }} / 100</h2>
+        <p><strong>Emails:</strong> {{ report.emails or "None found" }}</p>
+        <p><strong>Phones:</strong> {{ report.phones or "None found" }}</p>
+        <p><strong>Estimated experience (years):</strong> {{ report.experience_years }}</p>
+        <p><strong>Job match:</strong> {{ (report.job_match_score * 100) | round(0) }}%</p>
+
+        <h3>Top skills found</h3>
+        <ul>
+          {% for s in report.top_skills %}
+            <li>{{ s }}</li>
+          {% else %}
+            <li>No skills detected from the default list.</li>
+          {% endfor %}
+        </ul>
+
+        <h3>Missing sections</h3>
+        <ul>
+          {% for s in report.missing_sections %}
+            <li>{{ s }}</li>
+          {% else %}
+            <li>No obvious missing sections detected.</li>
+          {% endfor %}
+        </ul>
+
+        <h3>Suggestions</h3>
+        <ol>
+          {% for s in report.suggestions %}
+            <li>{{ s }}</li>
+          {% else %}
+            <li>No suggestions — good job!</li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endif %}
+
+      <footer class="footer">
+        <p>Tip: For richer analysis (PDF support, LLM suggestions), ask me to add those features.</p>
+      </footer>
+    </main>
+  </body>
+</html>
